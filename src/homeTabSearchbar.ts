@@ -4,15 +4,18 @@ import { writable, type Writable, get } from "svelte/store";
 import HomeTabFileSuggester from "src/suggester/homeTabSuggester";
 import OmnisearchSuggester from "./suggester/omnisearchSuggester";
 import SurfingSuggester from "./suggester/surfingSuggester";
+import CommandSuggester from "./suggester/commandSuggester";
 import { fileTypes, type FileExtension, type FileType, fileExtensions } from "./utils/getFileTypeUtils";
 
-export type SearchBarFilterType = 'fileExtension' | 'fileType' | 'webSearch' | 'omnisearch' | 'default'
+export type SearchBarFilterType = 'fileExtension' | 'fileType' | 'webSearch' | 'omnisearch' | 'command' | 'default'
 
 const omnisearchKeys = ['omnisearch', 'omni'] as const
 const webSearchKeys = ['surfing', 'web', 'internet'] as const
+const commandKeys = ['command', 'cmd'] as const
 
 export type OmnisearchFilterKey = typeof omnisearchKeys[number]
 export type WebsearchFilterKey = typeof webSearchKeys[number]
+export type CommandFilterKey = typeof commandKeys[number]
 export type ExtensionsearchFilterKey = FileExtension
 export type FileTypesearchFilterKey = FileType
 
@@ -21,11 +24,12 @@ const filterKeysLookupTable: FilterKeyLookupTable = {
     default: [],
     omnisearch: [...omnisearchKeys],
     webSearch: [...webSearchKeys],
+    command: [...commandKeys],
     fileType: [...fileTypes],
     fileExtension: [...fileExtensions],
 }
 
-export const filterKeys = [...filterKeysLookupTable.omnisearch, ...filterKeysLookupTable.webSearch, 
+export const filterKeys = [...filterKeysLookupTable.omnisearch, ...filterKeysLookupTable.webSearch, ...filterKeysLookupTable.command,
                     ...filterKeysLookupTable.fileType, ...filterKeysLookupTable.fileExtension]
 
 export type FilterKey = typeof filterKeys[number]
@@ -126,6 +130,11 @@ export default class HomeTabSearchBar{
                 this.fileSuggester.setFileFilter(filterKey as FileType | FileExtension)
                 filterEl.toggleClass('hide', false)
                 filterEl.setText(filterKey)
+                this.fileSuggester.setInput('')
+                break;
+            case 'command':
+                filterEl.toggleClass('hide', false)
+                this.fileSuggester = new CommandSuggester(this.plugin.app, this.plugin, this.view, this)
                 this.fileSuggester.setInput('')
                 break;
             default:

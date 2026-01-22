@@ -157,6 +157,22 @@
     
     <SearchBar {HomeTabSearchBar} embedded={embeddedView ? true : false}/>
 
+    {#if pluginSettings.pinnedCommands.length > 0}
+        <div class="home-tab-pinned-commands">
+            <h3>Pinned Commands</h3>
+            <div class="pinned-commands-list">
+                {#each pluginSettings.pinnedCommands as commandId}
+                    {@const command = (app as any).commands.listCommands().find((cmd: any) => cmd.id === commandId)}
+                    {#if command}
+                        <button class="pinned-command-button" on:click={() => (app as any).commands.executeCommandById(commandId)}>
+                            {command.name}
+                        </button>
+                    {/if}
+                {/each}
+            </div>
+        </div>
+    {/if}
+
     {#if isbookmarkedPluginEnabled && bookmarkedFileList && renderbookmarkedFiles}
         <BookmarkedFiles bookmarkedFiles={bookmarkedFileList} {view} {pluginSettings} bookmarkedFileManager={plugin.bookmarkedFileManager}/>
     {/if}
@@ -198,5 +214,38 @@
         .home-tab:not(.embedded) .home-tab-wordmark-container{
             padding-top: 10px;
         }
+    }
+
+    .home-tab-pinned-commands {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .home-tab-pinned-commands h3 {
+        margin-bottom: 10px;
+        font-size: 1.2em;
+        color: var(--text-muted);
+    }
+
+    .pinned-commands-list {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .pinned-command-button {
+        background: var(--interactive-normal);
+        border: 1px solid var(--background-modifier-border);
+        border-radius: 4px;
+        padding: 8px 12px;
+        cursor: pointer;
+        font-size: 0.9em;
+        color: var(--text-normal);
+        transition: background-color 0.2s;
+    }
+
+    .pinned-command-button:hover {
+        background: var(--interactive-hover);
     }
 </style>

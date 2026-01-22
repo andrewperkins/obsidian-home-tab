@@ -55,6 +55,7 @@ export interface HomeTabSettings extends ObjectKeys{
     closePreviousSessionTabs: boolean
     omnisearch: boolean
     showOmnisearchExcerpt: boolean
+    pinnedCommands: string[]
 }
 
 export const DEFAULT_SETTINGS: HomeTabSettings = {
@@ -88,6 +89,7 @@ export const DEFAULT_SETTINGS: HomeTabSettings = {
     closePreviousSessionTabs: false,
     omnisearch: false,
     showOmnisearchExcerpt: true,
+    pinnedCommands: []
 }
 
 
@@ -189,6 +191,19 @@ export class HomeTabSettingTab extends PluginSettingTab{
                 .setDynamicTooltip()
                 .onChange((value) => {this.plugin.settings.searchDelay = value; this.plugin.saveSettings(); this.plugin.refreshOpenViews()}))
             .then((settingEl) => this.addResetButton(settingEl, 'searchDelay'))
+
+        new Setting(containerEl)
+            .setName('Show pinned commands')
+            .setDesc('Displays pinned commands under the search bar.')
+            .addToggle((toggle) => toggle
+                .setValue(this.plugin.settings.pinnedCommands.length > 0)
+                .onChange((value) => {
+                    if (!value) {
+                        this.plugin.settings.pinnedCommands = [];
+                        this.plugin.saveSettings();
+                        this.plugin.refreshOpenViews();
+                    }
+                }))
 
         if(this.plugin.app.plugins.getPlugin('omnisearch')){
             new Setting(containerEl)
